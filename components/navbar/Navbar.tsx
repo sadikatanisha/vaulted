@@ -2,7 +2,11 @@
 import { Poppins } from "next/font/google";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs";
+import {
+  LoginLink,
+  LogoutLink,
+  RegisterLink,
+} from "@kinde-oss/kinde-auth-nextjs";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
@@ -39,7 +43,9 @@ export function Navbar({ user }: NavbarProps) {
         </ul>
       </div>
       {user ? (
-        <Button>Logout</Button>
+        <LogoutLink>
+          <Button>Logout</Button>
+        </LogoutLink>
       ) : (
         <div>
           <LoginLink>
