@@ -11,7 +11,7 @@ import {
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
 interface NavbarProps {
-  user?: Record<string, any> | null;
+  user?: Record<string, unknown> | null;
 }
 export function Navbar({ user }: NavbarProps) {
   return (
