@@ -20,9 +20,7 @@ export function Navbar({ user }: NavbarProps) {
         className={`flex h-[100%] items-center text-lg ${poppins.className}`}
       >
         <Link href="/">
-          <h1 className="bg-gradient-to-r from-[#8A2387] via-[#E94057] to-[#F27121] bg-clip-text text-2xl font-bold text-transparent">
-            Vaulted
-          </h1>
+          <h1 className="text-espresso text-2xl font-bold ">Vaulted</h1>
         </Link>
       </div>
 
