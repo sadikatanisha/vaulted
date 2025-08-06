@@ -1,19 +1,13 @@
-"use client";
+'use client'
 import { Poppins } from "next/font/google";
 import Link from "next/link";
-import { Button } from "../ui/button";
-import {
-  LoginLink,
-  LogoutLink,
-  RegisterLink,
-} from "@kinde-oss/kinde-auth-nextjs";
+
+import SignIn from "../SignIn";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
-interface NavbarProps {
-  user?: Record<string, any> | null;
-}
-export function Navbar({ user }: NavbarProps) {
+
+export function Navbar() {
   return (
     <nav className="flex h-[75px] w-[100%] items-center justify-between  px-14 py-3 text-shadow-orange-950">
       <div
@@ -40,20 +34,7 @@ export function Navbar({ user }: NavbarProps) {
           </li>
         </ul>
       </div>
-      {user ? (
-        <LogoutLink>
-          <Button>Logout</Button>
-        </LogoutLink>
-      ) : (
-        <div>
-          <LoginLink>
-            <Button>Login</Button>
-          </LoginLink>
-          <RegisterLink>
-            <Button>Sign Up</Button>
-          </RegisterLink>
-        </div>
-      )}
+<SignIn/>
     </nav>
   );
 }

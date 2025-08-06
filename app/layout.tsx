@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Open_Sans, Gelasio } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar/Navbar";
 import Footer from "@/components/shared/Footer";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,14 +25,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { getUser } = getKindeServerSession();
-  const user = await getUser();
+ 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${gelasio.variable} antialiased bg-[#fff3ef]`}
       >
-        <Navbar user={user} />
+        <Navbar  />
         {children}
         <Footer />
       </body>
