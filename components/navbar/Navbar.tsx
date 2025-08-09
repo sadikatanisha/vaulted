@@ -1,13 +1,19 @@
-'use client'
+
 import { Poppins } from "next/font/google";
 import Link from "next/link";
 
 import SignIn from "../SignIn";
+import { SignOut } from "../SignOut";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
 
-export function Navbar() {
+export async function Navbar() {
+   const session = await getServerSession(authOptions);
+   console.log("Session:", session);
+
   return (
     <nav className="flex h-[75px] w-[100%] items-center justify-between  px-14 py-3 text-shadow-orange-950">
       <div
@@ -34,7 +40,9 @@ export function Navbar() {
           </li>
         </ul>
       </div>
-<SignIn/>
+      {session?<SignOut/> : <SignIn/>}
+
+
     </nav>
   );
 }
