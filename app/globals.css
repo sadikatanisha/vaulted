@@ -50,8 +50,6 @@
 :root {
   --font-gelasio: "Gelasio", serif;
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -86,7 +84,7 @@
   --slate: hsla(25, 6%, 40%, 1); /* Muted neutral */
   --linen: hsla(20, 79%, 96%, 1); /* Background / Light neutral */
   --charcoal: hsla(0, 2%, 20%, 1); /* Foreground text */
-  --sandstone: hsla(30, 13%, 78%, 1); /* Accent / Secondary */
+  --sandstone: hsla(30, 13%, 78%, 1); /* Accent / Secondary */ --background: oklch(1 0 0); --foreground: oklch(0.145 0 0);
 }
 
 .dark {
