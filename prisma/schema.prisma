@@ -7,20 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+  SELLER
+}
+
+
 model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
+    password      String?
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   role         Role      @default(USER)
-}
-enum Role {
-  ADMIN
-  USER
-  SELLER
+
+  artworks      Artwork[] @relation("SellerArtworks")
+  bids          Bid[]
 }
 
 model Account {
@@ -58,10 +64,42 @@ model VerificationToken {
 }
 
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+model Artwork {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  imageUrl      String
+  startingPrice Float
+  currentPrice  Float    @default(0)
+  category      String?
+  status        AuctionStatus @default(ACTIVE)
+  
+  startTime     DateTime
+  endTime       DateTime
+
+  sellerId      String
+  seller        User     @relation("SellerArtworks", fields: [sellerId], references: [id])
+
+  bids          Bid[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum AuctionStatus {
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+// Bids placed by users
+model Bid {
+  id         String   @id @default(cuid())
+  amount     Float
+  createdAt  DateTime @default(now())
+
+  artworkId  String
+  artwork    Artwork  @relation(fields: [artworkId], references: [id])
+
+  bidderId   String
+  bidder     User     @relation(fields: [bidderId], references: [id])
 }
