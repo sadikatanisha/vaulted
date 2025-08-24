@@ -1,8 +1,7 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { Poppins } from "next/font/google";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,20 +17,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-import { Menu, X, Home, Compass, Users, Calendar, LogOut, LogIn } from "lucide-react";
+import { Menu, X} from "lucide-react";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
 export default function Navbar() {
- const session = null
+
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/explore", label: "Explore", icon: Compass },
-    { href: "/artists", label: "Artists", icon: Users },
-    { href: "/book", label: "Book Me", icon: Calendar },
+    { href: "/", label: "Home",  },
+    { href: "/explore", label: "Explore",  },
+    { href: "/artists", label: "Artists", },
   ];
 
   return (
@@ -53,7 +50,7 @@ export default function Navbar() {
                 href={link.href}
                 className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
               >
-                <link.icon className="h-4 w-4" />
+              
                 {link.label}
               </Link>
             ))}
@@ -63,7 +60,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {/* Desktop auth area */}
             <div className="hidden md:flex md:items-center md:gap-3">
-              {session ? (
+              {/* {session ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="px-2">
@@ -92,7 +89,7 @@ export default function Navbar() {
                   <LogIn className="mr-2 h-4 w-4" />
                   Log In
                 </Button>
-              )}
+              )} */}
             </div>
 
             {/* Mobile menu button */}
@@ -119,14 +116,14 @@ export default function Navbar() {
                         className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
                         onClick={() => setOpen(false)}
                       >
-                        <link.icon className="h-4 w-4" />
+              
                         {link.label}
                       </Link>
                     ))}
                   </div>
 
                   <div className="mt-6 border-t pt-4">
-                    {session ? (
+                    {/* {session ? (
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-3">
                           <Avatar>
@@ -151,7 +148,7 @@ export default function Navbar() {
                           <Link href="/register">Create account</Link>
                         </Button>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </SheetContent>
               </Sheet>

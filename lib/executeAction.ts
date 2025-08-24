@@ -1,5 +1,4 @@
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-
 type Options<T> = {
   actionFn: () => Promise<T>;
   successMessage?: string;
