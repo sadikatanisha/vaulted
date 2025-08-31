@@ -1,15 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { Poppins } from "next/font/google";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,24 +12,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-import { Menu, X, Home, Compass, Users, Calendar, LogOut, LogIn } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "800"] });
 
-export default function Navbar() {
- const session = null
+export default function Navbar({ session }: { session: any }) {
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/explore", label: "Explore", icon: Compass },
-    { href: "/artists", label: "Artists", icon: Users },
-    { href: "/book", label: "Book Me", icon: Calendar },
+    { href: "/", label: "Home" },
+    { href: "/explore", label: "Explore" },
+    { href: "/artists", label: "Artists" },
   ];
 
   return (
-    <header className={`w-full bg-white shadow-sm ${poppins.className}`}>
+    <header className={`w-full  bg-stone-50  ${poppins.className}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between gap-4">
           {/* Brand */}
@@ -51,9 +43,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 hover:text-slate-900"
+                className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 hover:text-stone-900"
               >
-                <link.icon className="h-4 w-4" />
                 {link.label}
               </Link>
             ))}
@@ -62,36 +53,48 @@ export default function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-3">
             {/* Desktop auth area */}
-            <div className="hidden md:flex md:items-center md:gap-3">
+            <div className="hidden md:flex md:items-center md:gap-3 select-none">
               {session ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="px-2">
+                    <Button
+                      variant="ghost"
+                      className=" bg-transparent p-0 rounded-full "
+                    >
                       <Avatar>
                         {session.user?.image ? (
-                          <AvatarImage src={session.user.image} alt={session.user?.name ?? "User"} />
+                          <AvatarImage
+                            src={session.user.image}
+                            alt={session.user?.name ?? "User"}
+                            className=""
+                          />
                         ) : (
-                          <AvatarFallback>{(session.user?.name || "U").slice(0, 2)}</AvatarFallback>
+                          <AvatarFallback className="text-white bg-stone-800">
+                            {(session.user?.name || "U").slice(0, 2)}
+                          </AvatarFallback>
                         )}
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel className="font-semibold">{session.user?.name}</DropdownMenuLabel>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-stone-50 text-stone-800 border"
+                  >
+                    <DropdownMenuLabel className="font-semibold">
+                      {session.user?.name}
+                    </DropdownMenuLabel>
                     <DropdownMenuItem asChild>
                       <Link href="/profile">Profile</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
                       Log out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button onClick={() => signIn()}>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Log In
-                </Button>
+                <Button>Log In</Button>
               )}
             </div>
 
@@ -100,7 +103,11 @@ export default function Navbar() {
               <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" className="p-2">
-                    {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                    {open ? (
+                      <X className="h-5 w-5" />
+                    ) : (
+                      <Menu className="h-5 w-5" />
+                    )}
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-72">
@@ -119,7 +126,6 @@ export default function Navbar() {
                         className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
                         onClick={() => setOpen(false)}
                       >
-                        <link.icon className="h-4 w-4" />
                         {link.label}
                       </Link>
                     ))}
@@ -131,22 +137,36 @@ export default function Navbar() {
                         <div className="flex items-center gap-3">
                           <Avatar>
                             {session.user?.image ? (
-                              <AvatarImage src={session.user.image} alt={session.user?.name ?? "User"} />
+                              <AvatarImage
+                                src={session.user.image}
+                                alt={session.user?.name ?? "User"}
+                              />
                             ) : (
-                              <AvatarFallback>{(session.user?.name || "U").slice(0, 2)}</AvatarFallback>
+                              <AvatarFallback>
+                                {(session.user?.name || "U").slice(0, 2)}
+                              </AvatarFallback>
                             )}
                           </Avatar>
                           <div>
-                            <div className="font-semibold">{session.user?.name}</div>
-                            <div className="text-sm text-muted-foreground">{session.user?.email}</div>
+                            <div className="font-semibold">
+                              {session.user?.name}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {session.user?.email}
+                            </div>
                           </div>
                         </div>
 
-                        <Button onClick={() => signOut({ callbackUrl: "/" })}>Log Out</Button>
+                        <Button onClick={() => signOut({ callbackUrl: "/" })}>
+                          Log Out
+                        </Button>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-2">
-                        <Button onClick={() => signIn()}>Log In</Button>
+                        <Button>
+                          <Link href="/login">Log In</Link>
+                        </Button>
+
                         <Button variant="secondary" asChild>
                           <Link href="/register">Create account</Link>
                         </Button>
