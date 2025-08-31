@@ -26,26 +26,37 @@ const SignInForm = () => {
   return (
     <FormProvider {...form}>
       <form
-        className="w-full max-w-96 space-y-5 rounded-md border px-10 py-12"
+        className="w-full max-w-md space-y-6 rounded-md px-8 py-10"
         onSubmit={form.handleSubmit(onSubmit)}
+        aria-label="Sign in form"
       >
         <div className="text-center">
           <h2 className="mb-1 text-2xl font-semibold">Welcome Back</h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Sign in to your account
           </p>
         </div>
 
-        <div className="space-y-3">
-          <ControlledInput<SignInSchema> name="email" label="Email" />
+        {/* inputs: only bottom borders (minimalist) */}
+        <div className="space-y-4">
+          <ControlledInput<SignInSchema>
+            name="email"
+            label="Email"
+            className="border-b pb-2 border-stone-200  focus:border-primary focus:outline-none bg-transparent placeholder:opacity-60"
+          />
+
           <ControlledInput<SignInSchema>
             name="password"
             label="Password"
             type="password"
+            className="border-b pb-2 border-stone-200  focus:border-primary focus:outline-none bg-transparent placeholder:opacity-60"
           />
         </div>
 
-        <Button className="w-full" isLoading={signInMutation.isPending}>
+        <Button
+          className="w-full rounded-full py-2"
+          isLoading={signInMutation.isPending}
+        >
           Sign In
         </Button>
 
@@ -53,7 +64,7 @@ const SignInForm = () => {
           Don&apos;t have an account?{" "}
           <Link
             href="/sign-up"
-            className="text-primary font-medium hover:underline"
+            className="text-stone-400 font-medium hover:underline"
           >
             Sign up
           </Link>

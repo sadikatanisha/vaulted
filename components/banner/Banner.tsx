@@ -3,15 +3,11 @@ import Image from "next/image";
 
 const Banner = () => {
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
-      {/* Top decorative line */}
-      <div className="border-t-2 border-gray-300 mb-8" />
-
+    <div className="max-w-7xl mx-auto px-6 py-4">
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-        <div className="text-5xl md:text-7xl font-extrabold text-gray-800 text-center md:text-left">
+        <div className="text-5xl md:text-7xl font-extrabold text-stone-800 text-center md:text-left">
           Discover <br />
-          Collect & <br /> Sell 
-           Art
+          Collect & <br /> Sell Art
         </div>
         <div>
           <Image
@@ -23,9 +19,6 @@ const Banner = () => {
           />
         </div>
       </div>
-
-      {/* Bottom decorative line */}
-      <div className="border-b-2 border-gray-300 mt-8" />
     </div>
   );
 };

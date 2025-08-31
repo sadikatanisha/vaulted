@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Open_Sans, Gelasio } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/app/_components/Navbar";
-import Footer from "@/components/shared/Footer";
 import { auth } from "@/lib/auth";
 import { Providers } from "@/components/providers";
 const geistSans = Geist({
@@ -27,15 +25,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  console.log(session);
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${gelasio.variable} antialiased`}>
-        <Providers>
-          <Navbar />
-          {children}
-          <Footer />
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 
 const Page = async () => {
   const session = await auth();
-  if (session?.user?.role === Role.ADMIN)
-    redirect("/admin/foods-management/foods");
-  if (session?.user?.role === Role.USER) redirect("/client");
+  // console.log(session);
+  // if (session?.user?.role === Role.ADMIN)
+  //   redirect("/admin/foods-management/foods");
+  // if (session?.user?.role === Role.BUYER) redirect("/");
   return (
     <div className="flex min-h-screen items-center justify-center">
       <SignUpForm />

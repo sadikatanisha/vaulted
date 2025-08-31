@@ -7,6 +7,7 @@ const signUpSchema = z
     email: z.string().email(),
     password: passwordSchema,
     confirmPassword: z.string(),
+    role: z.enum(["buyer", "admin", "seller"]).default("buyer"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -20,6 +21,7 @@ const signUpDefaultValues: SignUpSchema = {
   email: "",
   password: "",
   confirmPassword: "",
+  role: "buyer",
 };
 
 export { signUpDefaultValues, signUpSchema, type SignUpSchema };
