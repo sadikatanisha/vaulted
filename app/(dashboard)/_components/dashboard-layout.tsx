@@ -23,8 +23,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-type UserRole = "ADMIN" | "ARTIST" | "BUYER";
+import { Role } from "@prisma/client";
+type UserRole = "ADMIN" | "SELLER" | "BUYER";
 
 type RouteItem = { href: string; label: string; icon?: React.ReactNode };
 
@@ -42,7 +42,7 @@ export default function SimpleDashboardLayout({
   const pathname = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const role = (session?.user as any)?.role as UserRole | undefined;
+  const role = (session?.user as any)?.role as Role | undefined;
   const groups = useMemo(() => getRouteGroups(role), [role]);
 
   const handleSignOut = useCallback(() => {
@@ -55,7 +55,7 @@ export default function SimpleDashboardLayout({
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
       {/* Persistent sidebar (desktop) */}
-      <aside className="z-20 hidden h-screen w-72 flex-col border-r bg-stone-100 p-4 lg:flex">
+      <aside className="z-20 hidden lg:flex lg:fixed lg:left-0 lg:top-16 lg:bottom-0 lg:w-72 flex-col border-r bg-stone-100 p-4">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-md bg-primary/80 p-2 text-stone-800">
@@ -234,7 +234,7 @@ function SidebarLink({
 }
 
 // ----- utils -----
-function getRouteGroups(role?: UserRole): RouteGroup[] {
+function getRouteGroups(role?: Role): RouteGroup[] {
   const common: RouteGroup = {
     group: "Browse",
     items: [
@@ -288,7 +288,7 @@ function getRouteGroups(role?: UserRole): RouteGroup[] {
   };
 
   if (role === "ADMIN") return [common, admin];
-  if (role === "ARTIST") return [common, artist];
+  if (role === "SELLER") return [common, artist];
   if (role === "BUYER") return [common, collector];
   return [common];
 }
