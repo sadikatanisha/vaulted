@@ -68,7 +68,8 @@ model Artwork {
   id            String   @id @default(cuid())
   title         String
   description   String
-  imageUrl      String
+  primaryImage  String? 
+  images        ArtworkImage[]  
   startingPrice Float
   currentPrice  Float    @default(0)
   category      String?
@@ -83,6 +84,16 @@ model Artwork {
   bids          Bid[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model ArtworkImage {
+  id        String   @id @default(cuid())
+  artwork   Artwork  @relation(fields: [artworkId], references: [id])
+  artworkId String
+  url       String
+  order     Int?     // optional: control display order
+  alt       String?  // optional alt text
+  createdAt DateTime @default(now())
 }
 
 enum AuctionStatus {

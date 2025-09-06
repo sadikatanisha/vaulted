@@ -94,7 +94,20 @@ export default function Navbar({ session }: { session: any }) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button>Log In</Button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/sign-in"
+                    className="text-sm font-mediumn cursor-pointer"
+                  >
+                    <Button variant="secondary">Log In</Button>
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="text-sm font-mediumn cursor-pointer"
+                  >
+                    <Button>Sign Up</Button>
+                  </Link>
+                </div>
               )}
             </div>
 

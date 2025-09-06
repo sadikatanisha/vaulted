@@ -4,11 +4,11 @@
 
 ## 0) Project Setup
 
-- [ ] Monorepo / single app decided (e.g., Next.js App Router)
-- [ ] DB schema drafted (Users, Roles, Artworks, Auctions, Bids, Likes, Plans, Invoices, Notifications)
-- [ ] Auth provider chosen (email/password + OAuth optional)
-- [ ] Role-based access control (artist, bidder, admin)
-- [ ] UI kit + design tokens set (shadcn/ui or similar)
+- [X] Monorepo / single app decided (e.g., Next.js App Router)
+- [X] DB schema drafted (Users, Roles, Artworks, Auctions, Bids, Likes, Plans, Invoices, Notifications)
+- [X] Auth provider chosen (email/password + OAuth optional)
+- [X] Role-based access control (artist, bidder, admin)
+- [X] UI kit + design tokens set (shadcn/ui or similar)
 
 ## 1) Authentication & Roles
 
