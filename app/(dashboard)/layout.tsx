@@ -1,4 +1,3 @@
-// app/(dashboard)/layout.tsx
 import { ReactNode } from "react";
 import { auth } from "@/lib/auth";
 import { cookies } from "next/headers";
@@ -20,7 +19,6 @@ export default async function Layout({
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
   const raw = await auth();
-
   const userForClient = raw?.user
     ? {
         name: raw.user.name ?? null,

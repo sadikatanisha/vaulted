@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import React, { useCallback, useEffect, useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import {
   artworkSchema,
@@ -27,113 +27,150 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { MultiImageDropzoneUsage } from "./image-dropzone";
 
-// ----- Mock uploader: replace with Cloudinary/S3/Supabase/etc -----
-// returns a URL string for each file (here we return data-URL for demo)
-const uploadFileMock = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("upload failed"));
-    reader.readAsDataURL(file);
-  });
+type FormValues = ArtworkSchema;
 
-export default function ArtworkForm({ userId }: { userId: string }) {
+export default function ArtworkForm({ userId }: { userId?: string }) {
+  if (!userId) {
+    return (
+      <div className="p-6 rounded bg-yellow-50 text-sm text-yellow-800">
+        You need to sign in to list an artwork.{" "}
+        <a className="underline" href="/sign-in">
+          Sign in
+        </a>
+      </div>
+    );
+  }
+
+  // mutation + form setup
   const createArtwork = useCreateArtwork(userId);
-
-  // Use your zod-inferred type as the form generic
-  const form = useForm<ArtworkSchema>({
+  const form = useForm<FormValues>({
     defaultValues: artworkDefaultValues,
     mode: "onSubmit",
-    // NOTE: we are NOT using zodResolver here because image files must be uploaded first.
-    // We'll validate final payload using artworkSchema.parseAsync(payload).
   });
 
-  // local file states and previews
-  const [primaryFile, setPrimaryFile] = useState<File | null>(null);
+  // previews (we'll use URLs returned by the uploader)
   const [primaryPreview, setPrimaryPreview] = useState<string | null>(null);
-  const [additionalFiles, setAdditionalFiles] = useState<File[]>([]);
   const [additionalPreviews, setAdditionalPreviews] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
-  // helper to map zod errors into react-hook-form
-  const applyZodErrorsToForm = (zerr: z.ZodError) => {
-    zerr.errors.forEach((e) => {
-      const path = (e.path && e.path.join(".")) || "_form";
-      form.setError(path as any, { type: "manual", message: e.message });
-    });
-  };
+  // map zod errors -> RHF
+  const applyZodErrorsToForm = useCallback(
+    (zerr: z.ZodError) => {
+      zerr.errors.forEach((e) => {
+        const path = (e.path && e.path.join(".")) || "_form";
+        form.setError(path as any, { type: "manual", message: e.message });
+      });
+    },
+    [form]
+  );
 
-  const onSubmit: SubmitHandler<ArtworkSchema> = async (values) => {
-    setBusy(true);
-    // clear any previous zod/form errors
-    form.clearErrors();
+  // Primary image upload: use dropzone but limit to 1 file
+  const handlePrimaryUploaded = useCallback(
+    (url: string) => {
+      // set form primaryImage url
+      form.setValue("primaryImage", url, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
 
-    try {
-      // 1) upload files first
-      const uploadedUrls: string[] = [];
-
-      // upload primary file if present
-      let primaryUrl: string | undefined = undefined;
-      if (primaryFile) {
-        primaryUrl = await uploadFileMock(primaryFile);
-        uploadedUrls.push(primaryUrl);
-      }
-
-      // upload additional files
-      if (additionalFiles.length > 0) {
-        const others = await Promise.all(
-          additionalFiles.map((f) => uploadFileMock(f))
-        );
-        uploadedUrls.push(...others);
-      }
-
-      // 2) build payload matching your zod schema
-      // ensure primaryImage is part of imageUrls (your schema enforces this)
-      const finalImageUrls = [
-        ...new Set([...(uploadedUrls || []), ...values.imageUrls]),
-      ]; // keep uploaded first
-      const finalPrimary =
-        values.primaryImage || primaryUrl || finalImageUrls[0] || undefined;
-
-      const payload: ArtworkSchema = {
-        title: values.title,
-        description: values.description,
-        // artworkSchema expects imageUrls to be an array of valid URLs
-        imageUrls: finalImageUrls,
-        primaryImage: finalPrimary,
-        startingPrice: Number(values.startingPrice),
-        category: values.category,
-        // your schema expects startTime/endTime as strings (datetime-local style)
-        startTime: values.startTime,
-        endTime: values.endTime,
-      };
-
-      // 3) validate final payload with zod (this uses your runtime schema)
-      await artworkSchema.parseAsync(payload);
-
-      // 4) call your mutation (your server-side createArtwork expects imageUrls -> images.create)
-      createArtwork.mutate(payload);
-    } catch (err) {
-      // if zod error, map to form
-      if (err instanceof z.ZodError) {
-        applyZodErrorsToForm(err);
-      } else {
-        console.error("submit error", err);
-        form.setError("_form" as any, {
-          type: "manual",
-          message: "Unexpected error. Check console.",
+      // ensure it's included in imageUrls
+      const prev: string[] = form.getValues("imageUrls") ?? [];
+      if (!prev.includes(url)) {
+        form.setValue("imageUrls", [...prev, url], {
+          shouldDirty: true,
+          shouldValidate: true,
         });
       }
-    } finally {
-      setBusy(false);
-    }
-  };
+      setPrimaryPreview(url);
+    },
+    [form]
+  );
+
+  // Additional images uploaded
+  const handleAdditionalUploaded = useCallback(
+    (url: string) => {
+      const prev: string[] = form.getValues("imageUrls") ?? [];
+      if (!prev.includes(url)) {
+        const next = [...prev, url];
+        form.setValue("imageUrls", next, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+        setAdditionalPreviews(next);
+      } else {
+        setAdditionalPreviews((p) => Array.from(new Set([...p, url])));
+      }
+    },
+    [form]
+  );
+
+  const handleAdditionalBatch = useCallback(
+    (urls: string[]) => {
+      const prev: string[] = form.getValues("imageUrls") ?? [];
+      const merged = Array.from(new Set([...prev, ...urls]));
+      form.setValue("imageUrls", merged, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      setAdditionalPreviews(merged);
+    },
+    [form]
+  );
+
+  // SUBMIT: we no longer upload files here — uploader already did. only send URLs.
+  const onSubmit: SubmitHandler<FormValues> = useCallback(
+    async (values) => {
+      setBusy(true);
+      form.clearErrors();
+
+      try {
+        // filter out accidental data: URIs (safety)
+        const finalImageUrls = (values.imageUrls || []).filter(
+          (u) => typeof u === "string" && !u.startsWith("data:")
+        );
+
+        const finalPrimary =
+          values.primaryImage || finalImageUrls[0] || undefined;
+
+        const payload: FormValues = {
+          title: values.title,
+          description: values.description,
+          imageUrls: finalImageUrls,
+          primaryImage: finalPrimary,
+          startingPrice: Number(values.startingPrice),
+          category: values.category,
+          startTime: values.startTime,
+          endTime: values.endTime,
+        };
+
+        // server-side runtime validation (same zod schema)
+        await artworkSchema.parseAsync(payload);
+
+        // call mutation (react-query)
+        createArtwork.mutate(payload);
+      } catch (err) {
+        if (err instanceof z.ZodError) {
+          applyZodErrorsToForm(err);
+        } else {
+          console.error("submit error", err);
+          form.setError("_form" as any, {
+            type: "manual",
+            message: "Unexpected error. See console.",
+          });
+        }
+      } finally {
+        setBusy(false);
+      }
+    },
+    [applyZodErrorsToForm, createArtwork, form]
+  );
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Title */}
+        {/* title, description, price, category, time fields (same as before) */}
         <FormField
           control={form.control}
           name="title"
@@ -148,7 +185,6 @@ export default function ArtworkForm({ userId }: { userId: string }) {
           )}
         />
 
-        {/* Description */}
         <FormField
           control={form.control}
           name="description"
@@ -163,7 +199,6 @@ export default function ArtworkForm({ userId }: { userId: string }) {
           )}
         />
 
-        {/* Starting price */}
         <FormField
           control={form.control}
           name="startingPrice"
@@ -178,7 +213,6 @@ export default function ArtworkForm({ userId }: { userId: string }) {
           )}
         />
 
-        {/* Category */}
         <FormField
           control={form.control}
           name="category"
@@ -206,7 +240,6 @@ export default function ArtworkForm({ userId }: { userId: string }) {
           )}
         />
 
-        {/* Start / End time (these are strings as your schema expects) */}
         <FormField
           control={form.control}
           name="startTime"
@@ -235,19 +268,15 @@ export default function ArtworkForm({ userId }: { userId: string }) {
           )}
         />
 
-        {/* PRIMARY IMAGE (file input) */}
+        {/* Primary image — use dropzone limited to 1 file */}
         <FormItem>
-          <FormLabel>Primary Image (file)</FormLabel>
+          <FormLabel>Primary Image</FormLabel>
           <FormControl>
-            <Input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const f = e.target.files?.[0] ?? null;
-                setPrimaryFile(f);
-                if (f) setPrimaryPreview(URL.createObjectURL(f));
-                else setPrimaryPreview(null);
-              }}
+            <MultiImageDropzoneUsage
+              maxFiles={1}
+              maxSize={1024 * 1024 * 5}
+              onUploaded={handlePrimaryUploaded}
+              bucketName="publicFiles" // set to your bucket
             />
           </FormControl>
           {primaryPreview && (
@@ -257,26 +286,24 @@ export default function ArtworkForm({ userId }: { userId: string }) {
               className="mt-2 w-40 h-40 object-cover rounded"
             />
           )}
+          <FormMessage />
         </FormItem>
 
-        {/* ADDITIONAL IMAGES (files) */}
+        {/* Additional images — multi dropzone */}
         <FormItem>
-          <FormLabel>Additional Images (files)</FormLabel>
+          <FormLabel>Additional Images</FormLabel>
           <FormControl>
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => {
-                const files = e.target.files ? Array.from(e.target.files) : [];
-                setAdditionalFiles(files);
-                setAdditionalPreviews(files.map((f) => URL.createObjectURL(f)));
-              }}
+            <MultiImageDropzoneUsage
+              maxFiles={10}
+              maxSize={1024 * 1024 * 5}
+              onUploaded={handleAdditionalUploaded}
+              onUploadedBatch={handleAdditionalBatch}
+              bucketName="publicFiles"
             />
           </FormControl>
 
           {additionalPreviews.length > 0 && (
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex gap-2 overflow-auto">
               {additionalPreviews.map((p, i) => (
                 <img
                   key={i}
@@ -287,19 +314,19 @@ export default function ArtworkForm({ userId }: { userId: string }) {
               ))}
             </div>
           )}
+          <FormMessage />
         </FormItem>
 
+        {/* optional manual URLs field (keeps compatibility) */}
         <FormField
           control={form.control}
           name="imageUrls"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Image URLs (optional) — will be merged with uploaded files
-              </FormLabel>
+              <FormLabel>Image URLs (optional)</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Comma separated URLs (optional)"
+                  placeholder="Comma separated URLs"
                   value={
                     Array.isArray(field.value) ? field.value.join(",") : ""
                   }
@@ -324,17 +351,12 @@ export default function ArtworkForm({ userId }: { userId: string }) {
             <FormItem>
               <FormLabel>Primary Image URL (optional)</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="URL for primary image (optional)"
-                  {...field}
-                />
+                <Input placeholder="Primary image URL" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* global form error */}
 
         <div>
           <Button type="submit" disabled={busy || createArtwork.isLoading}>
