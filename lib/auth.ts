@@ -7,6 +7,7 @@ import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
   interface User {
+    id?: string;
     name?: string | null;
     role?: string | null;
   }
@@ -53,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         return {
-          id: toStringSafe(user.id),
+          id: user.id,
           email: user.email,
           name: user.name,
           role: user.role,
@@ -69,7 +70,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       const clonedToken = token;
       if (user) {
-        clonedToken.id = toNumberSafe(user.id);
+        clonedToken.id = user.id;
         clonedToken.name = user?.name;
         clonedToken.role = user?.role;
       }
@@ -79,9 +80,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const clonedSession = session;
 
       if (clonedSession.user) {
-        clonedSession.user.id = toStringSafe(token.id);
-        clonedSession.user.name = token.name;
-        clonedSession.user.role = token.role;
+        clonedSession.user.id = token.id as string;
+        clonedSession.user.name = token.name as string | undefined;
+        clonedSession.user.role = token.role as string | undefined;
       }
 
       return clonedSession;

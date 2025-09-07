@@ -1,11 +1,12 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 import { toast } from "sonner";
+import { AlertDialogProvider } from "./ui/alert-dialog-provider";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,9 +34,11 @@ const Providers = ({ children }: ProvidersProps) => {
       disableTransitionOnChange
     >
       <QueryClientProvider client={queryClient}>
-        <NextThemesProvider>{children}</NextThemesProvider>
+        <NextThemesProvider>
+          <EdgeStoreProvider>{children}</EdgeStoreProvider>
+        </NextThemesProvider>
         <Toaster />
-        {/* <AlertDialogProvider /> */}
+        <AlertDialogProvider />
       </QueryClientProvider>
     </NextThemesProvider>
   );
