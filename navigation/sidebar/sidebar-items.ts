@@ -82,7 +82,7 @@ export const sidebarItems: NavGroup[] = [
     items: [
       {
         title: "Create Listing",
-        url: "/artist/new",
+        url: "/artist/create",
         icon: Tag,
         roles: ["SELLER"],
       },
