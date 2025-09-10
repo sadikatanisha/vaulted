@@ -45,5 +45,3 @@ export const artworkDefaultValues: ArtworkSchema = {
     .toISOString()
     .slice(0, 16),
 };
-
-// export {artworkSchema, artworkDefaultValues, type ArtworkSchema}

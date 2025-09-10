@@ -359,8 +359,8 @@ export default function ArtworkForm({ userId }: { userId?: string }) {
         />
 
         <div>
-          <Button type="submit" disabled={busy || createArtwork.isLoading}>
-            {busy || createArtwork.isLoading ? "Creating..." : "Create Artwork"}
+          <Button type="submit" disabled={busy || createArtwork.isPending}>
+            {busy || createArtwork.isPending ? "Creating..." : "Create Artwork"}
           </Button>
         </div>
       </form>
