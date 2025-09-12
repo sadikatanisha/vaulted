@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className=" px-6 md:px-12 pb-8 pt-[-8px]">
+    <footer className=" px-6 md:px-12 pb-8 pt-[-8px] bg-stone-50">
       {/* outer rounded card */}
       <div className="max-w-7xl bg-stone-900 mx-auto rounded-2xl border md:py-12 py-8 px-6 md:px-12  shadow-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
