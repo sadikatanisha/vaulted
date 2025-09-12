@@ -33,7 +33,9 @@ export default function Navbar({ session }: { session: any }) {
           {/* Brand */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-extrabold text-espresso">Vaulted</h1>
+              <h1 className="text-2xl font-extrabold text-stone-800">
+                Vaulted
+              </h1>
             </Link>
           </div>
 
